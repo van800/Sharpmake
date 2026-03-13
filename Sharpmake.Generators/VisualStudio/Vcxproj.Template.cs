@@ -56,8 +56,14 @@ namespace Sharpmake.Generators.VisualStudio
 @"  </PropertyGroup>
 ";
 
+                public static string IsWindowsPropertyGroup =
+@"  <PropertyGroup>
+    <IsWindows>$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))</IsWindows>
+  </PropertyGroup>
+";
+
                 public static string ImportCppDefaultProps =
-@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.Default.props"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.Default.props"" Condition=""'$(IsWindows)' == 'true' ""/>
 ";
 
                 public static string PropertyGroupStart =
@@ -89,7 +95,7 @@ namespace Sharpmake.Generators.VisualStudio
                 @"</Project>";
 
                 public static string ProjectAfterConfigurationsGeneral =
-@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.props"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.props"" Condition=""'$(IsWindows)' == 'true' ""/>
   <ImportGroup Label=""ExtensionSettings"">
 ";
                 public static string ProjectAfterConfigurationsGeneralImportPropertySheets =
@@ -139,7 +145,7 @@ namespace Sharpmake.Generators.VisualStudio
 ";
 
                 public static string ProjectTargetsBegin =
-@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.targets"" />
+@"  <Import Project=""[vcTargetsPath]\Microsoft.Cpp.targets"" Condition=""'$(IsWindows)' == 'true' ""/>
   <ImportGroup Label=""ExtensionTargets"">
 ";
 
