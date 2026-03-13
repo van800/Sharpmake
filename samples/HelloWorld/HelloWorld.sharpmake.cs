@@ -17,7 +17,7 @@ namespace HelloWorld
             Name = "HelloWorld";
 
             AddTargets(new Target(
-                    Platform.win32 | Platform.win64,
+                    Platform.mac,
                     DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release
             ));
@@ -49,7 +49,7 @@ namespace HelloWorld
             Name = "HelloWorld";
 
             AddTargets(new Target(
-                    Platform.win32 | Platform.win64,
+                    Platform.mac,
                     DevEnv.vs2019,
                     Optimization.Debug | Optimization.Release
             ));
