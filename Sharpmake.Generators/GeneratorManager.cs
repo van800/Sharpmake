@@ -126,6 +126,18 @@ namespace Sharpmake.Generators
                              List<string> generatedFiles,
                              List<string> skipFiles)
         {
+            DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
+            if (devEnv.IsVisualStudio())
+            {
+                if (UtilityMethods.HasFastBuildConfig(configurations))
+                {
+                    MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                }
+
+                SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
+                return;
+            }
+
             if (configurations[0].Platform == Platform.ios ||
                 configurations[0].Platform == Platform.mac ||
                 configurations[0].Platform == Platform.tvos ||
@@ -141,7 +153,6 @@ namespace Sharpmake.Generators
             }
             else
             {
-                DevEnv devEnv = configurations[0].Target.GetFragment<DevEnv>();
                 switch (devEnv)
                 {
                     case DevEnv.make:
@@ -150,20 +161,6 @@ namespace Sharpmake.Generators
                                 MakeApplicationGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             else
                                 MakefileGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            break;
-                        }
-                    case DevEnv.vs2015:
-                    case DevEnv.vs2017:
-                    case DevEnv.vs2019:
-                    case DevEnv.vs2022:
-                    case DevEnv.vs2026:
-                        {
-                            if (UtilityMethods.HasFastBuildConfig(configurations))
-                            {
-                                MasterBffGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
-                            }
-
-                            SlnGenerator.Generate(builder, solution, configurations, solutionFile, generatedFiles, skipFiles);
                             break;
                         }
                     default:
