@@ -284,6 +284,9 @@ namespace Sharpmake.Generators.VisualStudio
             // write solution header
             switch (devEnv)
             {
+                case DevEnv.rider:
+                    fileGenerator.Write(Template.Solution.HeaderBeginVs2010); // todo: can be any of the headers
+                    break;
                 case DevEnv.vs2015:
                     fileGenerator.Write(Template.Solution.HeaderBeginVs2015);
                     break;

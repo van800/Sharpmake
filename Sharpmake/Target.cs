@@ -58,12 +58,24 @@ namespace Sharpmake
         /// GNU Makefiles.
         /// </summary>
         make = 1 << 9,
+        
+        /// <summary>
+        /// Rider on Linux and Mac
+        /// </summary>
+        rider = 1 << 11,
 
         /// <summary>
         /// All supported Visual Studio versions.
         /// </summary>
         [CompositeFragment]
         VisualStudio = vs2015 | vs2017 | vs2019 | vs2022 | vs2026,
+
+        /// <summary>
+        /// All development environments that use MSBuild project format (.vcxproj/.sln).
+        /// Includes Visual Studio and Rider.
+        /// </summary>
+        [CompositeFragment]
+        MSBuild = VisualStudio | rider,
 
         [Obsolete("Sharpmake doesn't support vs2010 anymore.")]
         vs2010 = -1,
