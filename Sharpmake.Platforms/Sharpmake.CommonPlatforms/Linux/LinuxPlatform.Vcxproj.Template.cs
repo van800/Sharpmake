@@ -157,6 +157,11 @@ del ""[options.OutputDirectory]\[conf.TargetFileFullName]"" &gt;NUL 2&gt;NUL</Cl
     <ApplicationTypeRevision>[applicationTypeRevision]</ApplicationTypeRevision>
     <TargetLinuxPlatform>[targetLinuxPlatform]</TargetLinuxPlatform>
 ";
+
+            private const string _makefileConfigurationTemplate =
+                @"  <Import Project=""$(SolutionDir)/../../JetBrains.Rider.Cpp.targets""/>
+  <Import Project=""$(SolutionDir)/../../nmake.substitution.props"" />
+";
         }
     }
 }

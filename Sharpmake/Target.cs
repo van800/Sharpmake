@@ -206,6 +206,13 @@ namespace Sharpmake
     }
 
     [Fragment, Flags]
+    public enum CppToolchain
+    {
+        Microsoft = 0x01,
+        Other = 0x02,
+    }
+
+    [Fragment, Flags]
     public enum DotNetFramework
     {
         net10_0 = 1 << 0,
@@ -325,6 +332,7 @@ namespace Sharpmake
         public DotNetFramework Framework;
         public string FrameworkFolder { get { return Framework.ToFolderName(); } }
         public Blob Blob;
+        public CppToolchain CppBuildSystem;
 
         public override string Name
         {
@@ -340,7 +348,8 @@ namespace Sharpmake
             OutputType outputType = OutputType.Lib,
             Blob blob = Blob.NoBlob,
             BuildSystem buildSystem = BuildSystem.MSBuild,
-            DotNetFramework framework = DotNetFramework.v4_7_2
+            DotNetFramework framework = DotNetFramework.v4_7_2,
+            CppToolchain cppBuildSystem = CppToolchain.Microsoft
         )
         {
             Platform = platform;
@@ -350,6 +359,7 @@ namespace Sharpmake
             Framework = framework;
             BuildSystem = buildSystem;
             Blob = blob;
+            CppBuildSystem = cppBuildSystem;
         }
     }
 
@@ -394,6 +404,11 @@ namespace Sharpmake
         public virtual string ProjectConfigurationName
         {
             get { return Name; }
+        }
+
+        public virtual bool UseMicrosoftCppPropsAndTargets
+        {
+            get => GetFragment<CppToolchain>() == CppToolchain.Microsoft;
         }
 
         public ITarget Clone(params object[] overrideValues)
