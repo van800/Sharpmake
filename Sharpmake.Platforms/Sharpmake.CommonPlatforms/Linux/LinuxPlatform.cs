@@ -22,6 +22,12 @@ namespace Sharpmake
             typeof(Project.Configuration.IConfigurationTasks))]
         public sealed partial class LinuxPlatform : BasePlatform, Project.Configuration.IConfigurationTasks, IFastBuildCompilerSettings, IClangPlatformBff
         {
+            protected override void WriteWindowsKitsOverrides(IVcxprojGenerationContext context, IFileGenerator fileGenerator)
+            {
+                // there is no Windows Kits on Linux
+                return;
+            }
+
             #region IPlatformDescriptor implementation
             public override string SimplePlatformString => "Linux";
             public override string GetToolchainPlatformString(ITarget target) => "x64";

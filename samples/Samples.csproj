@@ -19,5 +19,9 @@
     <ProjectReference Include="..\Sharpmake.Application\Sharpmake.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="HelloLinux\codebase\temp\projects\executable\" />
+  </ItemGroup>
+
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 </Project>

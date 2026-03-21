@@ -592,7 +592,7 @@ namespace Sharpmake.Generators.VisualStudio
 
             context.Options["TrackFileAccess"] = FileGeneratorUtilities.RemoveLineTag;
 
-            if (context.DevelopmentEnvironment.IsVisualStudio())
+            if (context.DevelopmentEnvironment.IsVisualStudio() || context.DevelopmentEnvironment == DevEnv.rider)
             {
                 SelectPreferredToolArchitecture(context);
                 SelectPlatformToolsetOption(context, optionsContext);
@@ -1327,7 +1327,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static void SelectPreferredToolArchitecture(IGenerationContext context)
         {
-            if (context.DevelopmentEnvironment.IsVisualStudio())
+            if (context.DevelopmentEnvironment.IsVisualStudio() || context.DevelopmentEnvironment == DevEnv.rider)
             {
                 context.SelectOption
                 (
@@ -1349,7 +1349,9 @@ namespace Sharpmake.Generators.VisualStudio
                 Options.Option(Options.Vc.General.PlatformToolset.v141_xp, () => { context.Options["PlatformToolset"] = "v141_xp"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.v142, () => { context.Options["PlatformToolset"] = "v142"; }),
                 Options.Option(Options.Vc.General.PlatformToolset.LLVM, () => { context.Options["PlatformToolset"] = "llvm"; }),
-                Options.Option(Options.Vc.General.PlatformToolset.ClangCL, () => { context.Options["PlatformToolset"] = "ClangCL"; })
+                Options.Option(Options.Vc.General.PlatformToolset.ClangCL, () => { context.Options["PlatformToolset"] = "ClangCL"; }),
+                Options.Option(Options.Vc.General.PlatformToolset.Clang_Linux, () => { context.Options["PlatformToolset"] = "Clang_Linux"; }),
+                Options.Option(Options.Vc.General.PlatformToolset.Clang_Mac, () => { context.Options["PlatformToolset"] = "Clang_Mac"; })
             );
             optionsContext.PlatformVcxproj.SetupPlatformToolsetOptions(context);
         }
@@ -1426,10 +1428,15 @@ namespace Sharpmake.Generators.VisualStudio
                     context.Options["OutputFile"] = optionsContext.OutputLibraryDirectoryRelative + Util.WindowsSeparator + context.Configuration.TargetFileFullNameWithExtension;
                     break;
                 case Project.Configuration.OutputType.Utility:
+
                 case Project.Configuration.OutputType.None:
                     context.Options["OutputFile"] = FileGeneratorUtilities.RemoveLineTag;
                     context.Options["OutputFileExtension"] = FileGeneratorUtilities.RemoveLineTag;
                     context.Options["OutputFileName"] = FileGeneratorUtilities.RemoveLineTag;
+                    break;
+                case Project.Configuration.OutputType.Makefile:
+                    context.Options["OutputFile"] = FileGeneratorUtilities.RemoveLineTag;
+                    context.Options["ApplicationType"] = "MakeFile";
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

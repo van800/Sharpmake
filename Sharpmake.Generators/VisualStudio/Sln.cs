@@ -870,6 +870,8 @@ namespace Sharpmake.Generators.VisualStudio
 
         private static string GetVisualStudioIdePath(DevEnv devEnv)
         {
+            if (!devEnv.IsVisualStudio()) 
+                return string.Empty;
             string commonToolsPath = devEnv.GetCommonToolsPath();
             if (commonToolsPath != null)
             {

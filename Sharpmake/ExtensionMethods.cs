@@ -185,6 +185,8 @@ namespace Sharpmake
         {
             switch (visualVersion)
             {
+                case DevEnv.rider:
+                    return "10.0";
                 case DevEnv.vs2015:
                     return "14.0";
                 case DevEnv.vs2017:
@@ -238,6 +240,8 @@ namespace Sharpmake
                     return "v143";
                 case DevEnv.vs2026:
                     return "v145";
+                case DevEnv.rider:
+                    return "Clang_Linux"; // todo: support Mac?
                 default:
                     throw new Error("DevEnv " + visualVersion + " not recognized!");
             }

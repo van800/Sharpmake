@@ -39,6 +39,9 @@ namespace Sharpmake
                     LLVM, // LLVM from Visual Studio 2017
                     [DevEnvVersion(minimum = DevEnv.vs2019)]
                     ClangCL, // LLVM as of Visual Studio 2019 official extension
+                    
+                    Clang_Mac, 
+                    Clang_Linux,
 
                     [Obsolete("Use either LLVM or ClangCL", error: true)]
                     LLVM_vs2012,

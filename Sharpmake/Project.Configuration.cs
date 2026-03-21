@@ -365,6 +365,11 @@ namespace Sharpmake
                 /// The output is an iOS test bundle.
                 /// </summary>
                 IosTestBundle,
+                
+                /// <summary>
+                /// MSBuild project with ConfigurationType = Makefile
+                /// </summary>
+                Makefile,
 
                 /// <summary>
                 /// Specifies no output. Do not use this.

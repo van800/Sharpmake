@@ -114,28 +114,14 @@ namespace HelloLinux
 
         public static CommonTarget[] GetDefaultTargets()
         {
-            var result = new List<CommonTarget>();
-            result.AddRange(GetLinuxTargets());
-            return result.ToArray();
-        }
-
-        public static CommonTarget[] GetLinuxTargets()
-        {
-            var defaultTarget = new CommonTarget(
+            var riderTarget = new CommonTarget(
                 Platform.linux,
-                DevEnv.make,
+                DevEnv.rider,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
             );
-
-            // make a fastbuild version of the target
-            var fastBuildTarget = (CommonTarget)defaultTarget.Clone(
-                Blob.FastBuildUnitys,
-                BuildSystem.FastBuild
-            );
-
-            return new[] { defaultTarget };
+            return [riderTarget];
         }
     }
 }
