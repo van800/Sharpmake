@@ -12,6 +12,7 @@ namespace HelloLinux
         {
             AddTargets(CommonTarget.GetDefaultTargets());
             Name = "header-only-lib";
+            StripFastBuildSourceFiles = false;
         }
 
         public override void ConfigureAll(Configuration conf, CommonTarget target)

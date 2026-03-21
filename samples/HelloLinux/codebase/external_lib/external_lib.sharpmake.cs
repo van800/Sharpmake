@@ -21,6 +21,8 @@ namespace HelloLinux
 
             //We name this project voluntarly curl in order to link to a library already existing in this OS. 
             Name = "curl";
+            
+            StripFastBuildSourceFiles = false;
         }
 
         public override void ConfigureAll(Configuration conf, CommonTarget target)
