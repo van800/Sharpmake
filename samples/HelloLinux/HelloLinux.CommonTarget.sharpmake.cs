@@ -123,7 +123,7 @@ namespace HelloLinux
         {
             var defaultTarget = new CommonTarget(
                 Platform.linux,
-                DevEnv.make,
+                DevEnv.vs2026,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
                 BuildSystem.Default
@@ -135,7 +135,7 @@ namespace HelloLinux
                 BuildSystem.FastBuild
             );
 
-            return new[] { defaultTarget };
+            return new[] { fastBuildTarget };
         }
     }
 }

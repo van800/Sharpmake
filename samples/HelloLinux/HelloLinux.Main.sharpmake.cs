@@ -84,8 +84,16 @@ namespace HelloLinux
 
             Bff.UnityResolver = new Bff.FragmentUnityResolver();
 
-            foreach (Type solutionType in Assembly.GetExecutingAssembly().GetTypes().Where(t => !t.IsAbstract && t.IsSubclassOf(typeof(CommonSolution))))
+            foreach (Type solutionType in Assembly.GetExecutingAssembly().GetTypes()
+                         .Where(t => !t.IsAbstract && t.IsSubclassOf(typeof(CommonSolution))))
                 arguments.Generate(solutionType);
+            
+            
+            var riderCppDir = new DirectoryInfo(Path.Combine(Globals.RootDirectory, "../../../tools/rider-cpp-msbuild"));
+            foreach (var file in riderCppDir.GetFiles("*", SearchOption.AllDirectories))
+            {
+                file.CopyTo(Globals.TmpDirectory);
+            }
         }
     }
 }

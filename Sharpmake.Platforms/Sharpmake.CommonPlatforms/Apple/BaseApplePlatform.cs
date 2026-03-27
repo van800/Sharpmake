@@ -1469,7 +1469,7 @@ namespace Sharpmake
 
         public virtual void SelectPreprocessorDefinitionsVcxproj(IVcxprojGenerationContext context)
         {
-            throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
         public bool HasPrecomp(IGenerationContext context)

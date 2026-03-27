@@ -4,11 +4,13 @@
 
 ## Introduction
 
-Sharpmake is a generator for Visual Studio projects and solutions. It is similar to *CMake* and *Premake*, but it is designed for **speed** and **scale**. Sharpmake has been used at Ubisoft to generate several thousands of `.vcxproj`, `.csproj` and `.sln` files in a matter of seconds, and each of these projects can support a large number of Visual Studio configurations as well.
+Sharpmake is a generator for MSBuild projects and solutions. It is similar to *CMake* and *Premake*, but it is designed for **speed** and **scale**. Sharpmake has been used at Ubisoft to generate several thousands of project files in a matter of seconds, and each of these projects can support a large number of Visual Studio configurations as well.
+
+The generated MSBuild projects work seamlessly with **Visual Studio** on Windows and **Rider** on all OS.
 
 That makes Sharpmake ideal for the development of multi-platform games, where the number of platforms, the different levels of optimization, the multiple rendering APIs on PC and the level editor can quickly multiply the number of configurations a given code base must support. Sharpmake generates all those configurations at once, very quickly. Thus, it becomes trivial to generate and regenerate the entire project.
 
-Sharpmake uses the C# language for its scripts, hence the name. That means you can edit your scripts in Visual Studio (or Visual Studio Code) and benefits from the default C# tooling (auto-completion, refactoring, debugger...).
+Sharpmake uses the C# language for its scripts, hence the name. That means you can edit your scripts in Visual Studio, Rider, or Visual Studio Code and benefit from the default C# tooling (auto-completion, refactoring, debugger...).
 
 Sharpmake can also generate makefiles and Xcode projects and can be run "natively" on any modern OSes that support recent version of the dotnet runtime.
 

@@ -206,6 +206,13 @@ namespace Sharpmake
     }
 
     [Fragment, Flags]
+    public enum CppToolchain
+    {
+        Microsoft = 0x01,
+        Other = 0x02,
+    }
+
+    [Fragment, Flags]
     public enum DotNetFramework
     {
         net10_0 = 1 << 0,
@@ -394,6 +401,11 @@ namespace Sharpmake
         public virtual string ProjectConfigurationName
         {
             get { return Name; }
+        }
+
+        public virtual bool UseMicrosoftCppPropsAndTargets
+        {
+            get => TryGetFragment<BuildSystem>(out var buildSystem) && buildSystem == BuildSystem.MSBuild;
         }
 
         public ITarget Clone(params object[] overrideValues)

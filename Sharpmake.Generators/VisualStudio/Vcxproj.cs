@@ -467,7 +467,8 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
 
-            fileGenerator.Write(Template.Project.ImportCppDefaultProps);
+            if (context.ProjectConfigurations.Any(conf => conf.Target.UseMicrosoftCppPropsAndTargets))
+                fileGenerator.Write(Template.Project.ImportCppDefaultProps);
 
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GeneratePostDefaultPropsImport(context, fileGenerator);
@@ -495,6 +496,8 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // .props files
+            if (context.ProjectConfigurations.Any(conf => conf.Target.UseMicrosoftCppPropsAndTargets))
+                fileGenerator.Write(Template.Project.MicrosoftCppProps);
             fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneral);
             if (context.Project.ContainsASM)
             {
@@ -671,6 +674,8 @@ namespace Sharpmake.Generators.VisualStudio
 
             // .targets files
             {
+                if (context.ProjectConfigurations.Any(conf => conf.Target.UseMicrosoftCppPropsAndTargets))
+                    fileGenerator.Write(Template.Project.ImportMicrosoftCppTargets);
                 fileGenerator.Write(Template.Project.ProjectTargetsBegin);
                 if (context.Project.ContainsASM)
                 {
