@@ -513,6 +513,11 @@ namespace Sharpmake
             return _projectConfigurationsStaticLinkTemplate;
         }
 
+        private string _makefileConfigurationTemplate =
+            @"  <Import Project=""$(SolutionDir)/rider-cpp-msbuild/JetBrains.Rider.Cpp.targets""/>
+  <Import Project=""$(SolutionDir)/rider-cpp-msbuild/nmake.substitution.props"" />
+";
+
         protected IEnumerable<string> EnumerateSemiColonSeparatedString(string str)
         {
             string[] dirs = str.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);

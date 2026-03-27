@@ -30,7 +30,6 @@ namespace HelloLinux
         public Optimization Optimization;
         public Blob Blob;
         public BuildSystem BuildSystem;
-        public CppToolchain CppBuildSystem;
 
         public CommonTarget() { }
 
@@ -39,8 +38,7 @@ namespace HelloLinux
             DevEnv devEnv,
             Optimization optimization,
             Blob blob,
-            BuildSystem buildSystem,
-            CppToolchain cppBuildSystem
+            BuildSystem buildSystem
         )
         {
             Platform = platform;
@@ -48,7 +46,6 @@ namespace HelloLinux
             Optimization = optimization;
             Blob = blob;
             BuildSystem = buildSystem;
-            CppBuildSystem = cppBuildSystem;
         }
 
         public override string Name
@@ -129,8 +126,7 @@ namespace HelloLinux
                 DevEnv.vs2026,
                 Optimization.Debug | Optimization.Release,
                 Blob.NoBlob,
-                BuildSystem.Default,
-                CppToolchain.Other
+                BuildSystem.Default
             );
 
             // make a fastbuild version of the target

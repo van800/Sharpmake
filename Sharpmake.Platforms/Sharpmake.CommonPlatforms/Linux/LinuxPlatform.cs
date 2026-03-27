@@ -119,11 +119,6 @@ namespace Sharpmake
                     Sharpmake.Options.Option(Options.General.VcPlatformToolset.WSL2_1_0, () => { context.Options["PlatformToolset"] = "WSL2_1_0"; })
                 );
             }
-            
-            public override void GenerateMakefileConfigurationVcxproj(IVcxprojGenerationContext context, IFileGenerator generator)
-            {
-                generator.Write(_makefileConfigurationTemplate);
-            }
 
             public override void SetupPlatformTargetOptions(IGenerationContext context)
             {

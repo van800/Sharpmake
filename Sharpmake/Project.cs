@@ -423,7 +423,7 @@ namespace Sharpmake
         }
 
         // If true, remove the source files from a FastBuild project's associated vcxproj file.
-        private bool _stripFastBuildSourceFiles = true;
+        private bool _stripFastBuildSourceFiles = false;
         public bool StripFastBuildSourceFiles
         {
             get { return _stripFastBuildSourceFiles; }

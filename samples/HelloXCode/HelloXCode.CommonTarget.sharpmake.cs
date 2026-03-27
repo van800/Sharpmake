@@ -129,6 +129,7 @@ namespace HelloXCode
             // make a fastbuild version of the target
             var macosFastBuildTarget = (CommonTarget)macosTarget.Clone(
                 Blob.FastBuildUnitys,
+                DevEnv.vs2026,
                 BuildSystem.FastBuild
             );
 
@@ -148,6 +149,7 @@ namespace HelloXCode
             // make a fastbuild version of the target
             var iosFastBuildTarget = (CommonTarget)iosTarget.Clone(
                 Blob.FastBuildUnitys,
+                DevEnv.vs2026,
                 BuildSystem.FastBuild
             );
 
@@ -167,6 +169,7 @@ namespace HelloXCode
             // make a fastbuild version of the target
             var tvosFastBuildTarget = (CommonTarget)tvosTarget.Clone(
                 Blob.FastBuildUnitys,
+                DevEnv.vs2026,
                 BuildSystem.FastBuild
             );
 
@@ -186,6 +189,7 @@ namespace HelloXCode
             // make a fastbuild version of the target
             var watchosFastBuildTarget = (CommonTarget)watchosTarget.Clone(
                 Blob.FastBuildUnitys,
+                DevEnv.vs2026,
                 BuildSystem.FastBuild
             );
 
@@ -205,6 +209,7 @@ namespace HelloXCode
             // make a FastBuild version of the target
             var catalystFastBuildTarget = (CommonTarget)catalystTarget.Clone(
                 Blob.FastBuildUnitys,
+                DevEnv.vs2026,
                 BuildSystem.FastBuild
             );
 

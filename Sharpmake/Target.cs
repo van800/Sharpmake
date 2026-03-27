@@ -332,7 +332,6 @@ namespace Sharpmake
         public DotNetFramework Framework;
         public string FrameworkFolder { get { return Framework.ToFolderName(); } }
         public Blob Blob;
-        public CppToolchain CppBuildSystem;
 
         public override string Name
         {
@@ -348,8 +347,7 @@ namespace Sharpmake
             OutputType outputType = OutputType.Lib,
             Blob blob = Blob.NoBlob,
             BuildSystem buildSystem = BuildSystem.MSBuild,
-            DotNetFramework framework = DotNetFramework.v4_7_2,
-            CppToolchain cppBuildSystem = CppToolchain.Microsoft
+            DotNetFramework framework = DotNetFramework.v4_7_2
         )
         {
             Platform = platform;
@@ -359,7 +357,6 @@ namespace Sharpmake
             Framework = framework;
             BuildSystem = buildSystem;
             Blob = blob;
-            CppBuildSystem = cppBuildSystem;
         }
     }
 
@@ -408,7 +405,7 @@ namespace Sharpmake
 
         public virtual bool UseMicrosoftCppPropsAndTargets
         {
-            get => GetFragment<CppToolchain>() == CppToolchain.Microsoft;
+            get => TryGetFragment<BuildSystem>(out var buildSystem) && buildSystem == BuildSystem.MSBuild;
         }
 
         public ITarget Clone(params object[] overrideValues)
