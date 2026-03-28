@@ -467,7 +467,9 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
 
-            fileGenerator.Write(Template.Project.ImportCppDefaultProps);
+            bool hasVcxprojBuildSupport = context.PresentPlatforms.Values.Any(p => p.HasVcxprojBuildSupport);
+            if (hasVcxprojBuildSupport)
+                fileGenerator.Write(Template.Project.ImportCppDefaultProps);
 
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GeneratePostDefaultPropsImport(context, fileGenerator);
@@ -495,32 +497,40 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // .props files
-            fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneral);
-            if (context.Project.ContainsASM)
+            if (hasVcxprojBuildSupport)
             {
-                fileGenerator.Write(Template.Project.ProjectImportedMasmProps);
-            }
+                fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneral);
+                if (context.Project.ContainsASM)
+                {
+                    fileGenerator.Write(Template.Project.ProjectImportedMasmProps);
+                }
 
-            if (context.Project.ContainsNASM)
+                if (context.Project.ContainsNASM)
+                {
+                    if (context.Project.NasmExePath.Length == 0)
+                    {
+                        throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
+                    }
+                    using (fileGenerator.Declare("importedNasmPropsFile", context.Project.NasmPropsFile))
+                    {
+                        fileGenerator.Write(Template.Project.ProjectImportedNasmProps);
+                    }
+                }
+
+                VsProjCommon.WriteProjectCustomPropsFiles(context.Project.CustomPropsFiles, context.ProjectDirectoryCapitalized, fileGenerator);
+                VsProjCommon.WriteConfigurationsCustomPropsFiles(context.ProjectConfigurations, context.ProjectDirectoryCapitalized, fileGenerator);
+
+                fileGenerator.Write(Template.Project.ProjectImportedPropsEnd);
+                fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneralImportPropertySheets);
+                foreach (var platform in context.PresentPlatforms.Values)
+                    platform.GenerateProjectPlatformImportSheet(context, fileGenerator);
+                fileGenerator.Write(Template.Project.ProjectAfterImportedProps);
+            }
+            else
             {
-                if (context.Project.NasmExePath.Length == 0)
-                {
-                    throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
-                }
-                using (fileGenerator.Declare("importedNasmPropsFile", context.Project.NasmPropsFile))
-                {
-                    fileGenerator.Write(Template.Project.ProjectImportedNasmProps);
-                }
+                VsProjCommon.WriteProjectCustomPropsFiles(context.Project.CustomPropsFiles, context.ProjectDirectoryCapitalized, fileGenerator);
+                VsProjCommon.WriteConfigurationsCustomPropsFiles(context.ProjectConfigurations, context.ProjectDirectoryCapitalized, fileGenerator);
             }
-
-            VsProjCommon.WriteProjectCustomPropsFiles(context.Project.CustomPropsFiles, context.ProjectDirectoryCapitalized, fileGenerator);
-            VsProjCommon.WriteConfigurationsCustomPropsFiles(context.ProjectConfigurations, context.ProjectDirectoryCapitalized, fileGenerator);
-
-            fileGenerator.Write(Template.Project.ProjectImportedPropsEnd);
-            fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneralImportPropertySheets);
-            foreach (var platform in context.PresentPlatforms.Values)
-                platform.GenerateProjectPlatformImportSheet(context, fileGenerator);
-            fileGenerator.Write(Template.Project.ProjectAfterImportedProps);
 
             // configuration general2
             using (Builder.Instance.CreateProfilingScope("GenerateImpl:confs3", context.ProjectConfigurations.Count))
@@ -671,10 +681,12 @@ namespace Sharpmake.Generators.VisualStudio
 
             // .targets files
             {
-                fileGenerator.Write(Template.Project.ProjectTargetsBegin);
+                if (hasVcxprojBuildSupport)
+                    fileGenerator.Write(Template.Project.ProjectTargetsBegin);
                 if (context.Project.ContainsASM)
                 {
-                    fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
+                    if (hasVcxprojBuildSupport)
+                        fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
                 }
                 if (context.Project.ContainsNASM)
                 {
@@ -682,9 +694,12 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
                     }
-                    using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
+                    if (hasVcxprojBuildSupport)
                     {
-                        fileGenerator.Write(Template.Project.ProjectNasmTargetsItem);
+                        using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
+                        {
+                            fileGenerator.Write(Template.Project.ProjectNasmTargetsItem);
+                        }
                     }
                 }
 
@@ -721,7 +736,8 @@ namespace Sharpmake.Generators.VisualStudio
                 // add .targets files imported from nuget packages (if using packages.config mode)
                 nuGet.TryGenerateImport(NuGet.ImportFileExtension.Targets, firstConf, fileGenerator);
 
-                fileGenerator.Write(Template.Project.ProjectTargetsEnd);
+                if (hasVcxprojBuildSupport)
+                    fileGenerator.Write(Template.Project.ProjectTargetsEnd);
             } // .targets files done
 
             // add error checks for nuget package targets files (if using packages.config mode)
@@ -780,7 +796,19 @@ namespace Sharpmake.Generators.VisualStudio
             context.Options["AdditionalPlatformIncludeDirectories"] = platformIncludePaths.Any() ? Util.PathGetRelative(context.ProjectDirectory, platformIncludePaths).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
 
             var nmakeIncludeSearchPath = includePaths.Concat(platformIncludePaths);
-            context.Options["NMakeIncludeSearchPath"] = nmakeIncludeSearchPath.Any() ? Util.PathGetRelative(context.ProjectDirectory, nmakeIncludeSearchPath).JoinStrings(";") : FileGeneratorUtilities.RemoveLineTag;
+
+            // For platforms without standard VCTargets build support (e.g. Apple platforms),
+            // add system include paths discovered via clang for IntelliSense in NMakeIncludeSearchPath.
+            // The system include paths are kept absolute as they refer to SDK locations on disk.
+            IEnumerable<string> vcxprojSystemIncludePaths = Enumerable.Empty<string>();
+            if (!platformVcxproj.HasVcxprojBuildSupport)
+                vcxprojSystemIncludePaths = platformVcxproj.GetVcxprojSystemIncludePaths(context);
+
+            {
+                var projectPaths = Util.PathGetRelative(context.ProjectDirectory, nmakeIncludeSearchPath);
+                var allSearchPaths = projectPaths.Concat(vcxprojSystemIncludePaths).ToList();
+                context.Options["NMakeIncludeSearchPath"] = allSearchPaths.Count > 0 ? string.Join(";", allSearchPaths) : FileGeneratorUtilities.RemoveLineTag;
+            }
 
             // Fill resource include dirs
             var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);
