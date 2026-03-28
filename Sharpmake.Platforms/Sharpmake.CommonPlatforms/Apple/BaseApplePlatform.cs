@@ -1633,9 +1633,15 @@ namespace Sharpmake
             // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
         }
 
+        private const string _projectConfigurationsGeneral2 =
+            @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+  </PropertyGroup>
+";
+
         public void GenerateProjectConfigurationGeneral2(IVcxprojGenerationContext context, IFileGenerator generator)
         {
-            // throw new NotImplementedException(SimplePlatformString + " should not be called by a Vcxproj generator");
+            generator.Write(_projectConfigurationsGeneral2);
         }
 
         public void GenerateProjectConfigurationFastBuildMakeFile(IVcxprojGenerationContext context, IFileGenerator generator)
