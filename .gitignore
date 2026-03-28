@@ -60,4 +60,4 @@ Sharpmake.Application.args.json
 **/.DS_Store
 
 # Claude and other AI localconfig files below
-.claude/settings.local.json
+.claude/settings.local.json.nuget/
