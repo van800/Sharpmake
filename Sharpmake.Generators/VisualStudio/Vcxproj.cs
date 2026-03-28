@@ -791,18 +791,8 @@ namespace Sharpmake.Generators.VisualStudio
 
             var nmakeIncludeSearchPath = includePaths.Concat(platformIncludePaths);
 
-            // For platforms without standard VCTargets build support (e.g. Apple platforms),
-            // add system include paths discovered via clang for IntelliSense in NMakeIncludeSearchPath.
-            // The system include paths are kept absolute as they refer to SDK locations on disk.
-            IEnumerable<string> vcxprojSystemIncludePaths = Enumerable.Empty<string>();
-            if (!platformVcxproj.IsMSVC)
-                vcxprojSystemIncludePaths = platformVcxproj.GetSystemIncludePaths(context);
-
-            {
-                var projectPaths = Util.PathGetRelative(context.ProjectDirectory, nmakeIncludeSearchPath);
-                var allSearchPaths = projectPaths.Concat(vcxprojSystemIncludePaths).ToList();
-                context.Options["NMakeIncludeSearchPath"] = allSearchPaths.Count > 0 ? string.Join(";", allSearchPaths) : FileGeneratorUtilities.RemoveLineTag;
-            }
+            var nmakeSearchPaths = Util.PathGetRelative(context.ProjectDirectory, nmakeIncludeSearchPath);
+            context.Options["NMakeIncludeSearchPath"] = nmakeSearchPaths.Any() ? string.Join(";", nmakeSearchPaths) : FileGeneratorUtilities.RemoveLineTag;
 
             // Fill resource include dirs
             var resourceIncludePaths = platformVcxproj.GetResourceIncludePaths(context);

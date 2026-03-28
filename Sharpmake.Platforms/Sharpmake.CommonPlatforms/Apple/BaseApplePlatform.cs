@@ -662,11 +662,6 @@ namespace Sharpmake
             }
         }
 
-        public IEnumerable<string> GetSystemIncludePaths(IGenerationContext context)
-        {
-            return GetClangSystemIncludePathsForSdk(XcrunSdkName);
-        }
-
         public IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context)
         {
             yield break;
@@ -701,7 +696,8 @@ namespace Sharpmake
         }
         public IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context)
         {
-            return GetPlatformIncludePathsWithPrefixImpl(context).Select(x => x.Path);
+            return GetPlatformIncludePathsWithPrefixImpl(context).Select(x => x.Path)
+                .Concat(GetClangSystemIncludePathsForSdk(XcrunSdkName));
         }
         public IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(IGenerationContext context)
         {

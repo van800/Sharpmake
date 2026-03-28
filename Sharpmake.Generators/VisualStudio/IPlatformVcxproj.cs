@@ -41,13 +41,8 @@ namespace Sharpmake.Generators.VisualStudio
         bool HasUserAccountControlSupport { get; }
         bool HasEditAndContinueDebuggingSupport { get; }
 
-        // When false, the generator will skip the standard Microsoft.Cpp.*.props/targets imports
-        // and instead populate NMakeIncludeSearchPath with platform-specific system include paths.
+        // When false, the generator will skip the standard Microsoft.Cpp.*.props/targets imports.
         bool IsMSVC { get; }
-
-        // Returns additional system include paths to add to NMakeIncludeSearchPath in vcxproj
-        // (used when IsMSVC is false, e.g. Apple platforms)
-        IEnumerable<string> GetSystemIncludePaths(IGenerationContext context);
 
         IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context);
 
