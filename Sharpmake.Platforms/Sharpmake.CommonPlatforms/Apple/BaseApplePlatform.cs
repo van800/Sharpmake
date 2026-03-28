@@ -1635,7 +1635,10 @@ namespace Sharpmake
 
         private const string _projectConfigurationsGeneral2 =
             @"  <PropertyGroup Condition=""'$(Configuration)|$(Platform)'=='[conf.Name]|[platformName]'"">
+    <NMakePreprocessorDefinitions>[EscapeXML:options.PreprocessorDefinitions][EscapeXML:options.IntellisenseAdditionalDefines]</NMakePreprocessorDefinitions>
     <NMakeIncludeSearchPath>[options.NMakeIncludeSearchPath]</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes>[options.ForcedIncludeFiles]</NMakeForcedIncludes>
+    <AdditionalOptions>[options.IntellisenseCommandLineOptions]</AdditionalOptions>
   </PropertyGroup>
 ";
 
