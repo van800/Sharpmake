@@ -467,8 +467,8 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
 
-            bool hasVcxprojBuildSupport = context.PresentPlatforms.Values.Any(p => p.IsMSVC);
-            if (hasVcxprojBuildSupport)
+            bool isMSVC = context.PresentPlatforms.Values.Any(p => p.IsMSVC);
+            if (isMSVC)
                 fileGenerator.Write(Template.Project.ImportCppDefaultProps);
 
             foreach (var platform in context.PresentPlatforms.Values)
@@ -497,7 +497,7 @@ namespace Sharpmake.Generators.VisualStudio
             }
 
             // .props files
-            if (hasVcxprojBuildSupport)
+            if (isMSVC)
                 fileGenerator.Write(Template.Project.MicrosoftCppProps);
             fileGenerator.Write(Template.Project.ProjectAfterConfigurationsGeneral);
             if (context.Project.ContainsASM)
@@ -675,12 +675,12 @@ namespace Sharpmake.Generators.VisualStudio
 
             // .targets files
             {
-                if (hasVcxprojBuildSupport)
+                if (isMSVC)
                     fileGenerator.Write(Template.Project.ImportMicrosoftCppTargets);
                 fileGenerator.Write(Template.Project.ProjectTargetsBegin);
                 if (context.Project.ContainsASM)
                 {
-                    if (hasVcxprojBuildSupport)
+                    if (isMSVC)
                         fileGenerator.Write(Template.Project.ProjectMasmTargetsItem);
                 }
                 if (context.Project.ContainsNASM)
@@ -689,7 +689,7 @@ namespace Sharpmake.Generators.VisualStudio
                     {
                         throw new ArgumentNullException("NasmExePath not set and needed for NASM assembly files.");
                     }
-                    if (hasVcxprojBuildSupport)
+                    if (isMSVC)
                     {
                         using (fileGenerator.Declare("importedNasmTargetsFile", context.Project.NasmTargetsFile))
                         {
