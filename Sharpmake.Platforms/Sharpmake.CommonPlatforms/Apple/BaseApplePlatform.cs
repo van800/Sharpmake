@@ -1568,6 +1568,14 @@ namespace Sharpmake
             var defines = new Strings();
             defines.AddRange(context.Options.ExplicitDefines);
             defines.AddRange(context.Configuration.Defines);
+
+            // Extract -DFOO defines from AdditionalCompilerOptions
+            foreach (string compilerOption in context.Configuration.AdditionalCompilerOptions)
+            {
+                if (compilerOption.StartsWith("-D", StringComparison.Ordinal))
+                    defines.Add(compilerOption.Substring(2));
+            }
+
             context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";");
         }
 
