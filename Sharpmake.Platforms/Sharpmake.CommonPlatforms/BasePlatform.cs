@@ -144,7 +144,7 @@ namespace Sharpmake
         {
         }
 
-        public virtual IEnumerable<string> GetVcxprojSystemIncludePaths(IGenerationContext context)
+        public virtual IEnumerable<string> GetSystemIncludePaths(IGenerationContext context)
         {
             yield break;
         }

@@ -662,7 +662,7 @@ namespace Sharpmake
             }
         }
 
-        public IEnumerable<string> GetVcxprojSystemIncludePaths(IGenerationContext context)
+        public IEnumerable<string> GetSystemIncludePaths(IGenerationContext context)
         {
             return GetClangSystemIncludePathsForSdk(XcrunSdkName);
         }
