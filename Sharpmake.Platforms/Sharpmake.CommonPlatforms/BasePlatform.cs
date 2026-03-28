@@ -144,11 +144,6 @@ namespace Sharpmake
         {
         }
 
-        public virtual IEnumerable<string> GetSystemIncludePaths(IGenerationContext context)
-        {
-            yield break;
-        }
-
         public virtual IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context)
         {
             yield break;
