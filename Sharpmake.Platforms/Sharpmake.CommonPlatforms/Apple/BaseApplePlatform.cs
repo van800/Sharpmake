@@ -567,7 +567,7 @@ namespace Sharpmake
         public bool ExcludesPrecompiledHeadersFromBuild => false;
         public bool HasUserAccountControlSupport => false;
         public bool HasEditAndContinueDebuggingSupport => false;
-        public bool HasVcxprojBuildSupport => false;
+        public bool IsMSVC => false;
 
         // The xcrun SDK name for this platform, e.g. "iphoneos", "macosx", "appletvos", "watchos"
         protected abstract string XcrunSdkName { get; }

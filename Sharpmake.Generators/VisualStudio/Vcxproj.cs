@@ -467,7 +467,7 @@ namespace Sharpmake.Generators.VisualStudio
             foreach (var platform in context.PresentPlatforms.Values)
                 platform.GenerateProjectPlatformSdkDirectoryDescription(context, fileGenerator);
 
-            bool hasVcxprojBuildSupport = context.PresentPlatforms.Values.Any(p => p.HasVcxprojBuildSupport);
+            bool hasVcxprojBuildSupport = context.PresentPlatforms.Values.Any(p => p.IsMSVC);
             if (hasVcxprojBuildSupport)
                 fileGenerator.Write(Template.Project.ImportCppDefaultProps);
 
@@ -801,7 +801,7 @@ namespace Sharpmake.Generators.VisualStudio
             // add system include paths discovered via clang for IntelliSense in NMakeIncludeSearchPath.
             // The system include paths are kept absolute as they refer to SDK locations on disk.
             IEnumerable<string> vcxprojSystemIncludePaths = Enumerable.Empty<string>();
-            if (!platformVcxproj.HasVcxprojBuildSupport)
+            if (!platformVcxproj.IsMSVC)
                 vcxprojSystemIncludePaths = platformVcxproj.GetVcxprojSystemIncludePaths(context);
 
             {
