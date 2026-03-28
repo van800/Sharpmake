@@ -578,6 +578,52 @@ namespace Sharpmake
         private static readonly Dictionary<string, IReadOnlyList<string>> s_clangBuiltinDefinesCache = new Dictionary<string, IReadOnlyList<string>>();
         private static readonly object s_clangBuiltinDefinesCacheLock = new object();
 
+        // Cache: sdkName -> sdk path (result of `xcrun --sdk <sdkName> --show-sdk-path`)
+        private static readonly Dictionary<string, string> s_sdkPathCache = new Dictionary<string, string>();
+        private static readonly object s_sdkPathCacheLock = new object();
+
+        private static string GetSdkPath(string sdkName)
+        {
+            lock (s_sdkPathCacheLock)
+            {
+                if (s_sdkPathCache.TryGetValue(sdkName, out var cached))
+                    return cached;
+
+                string sdkPath = string.Empty;
+                try
+                {
+                    sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceWarning($"[Sharpmake] Could not get SDK path for '{sdkName}': {ex.Message}");
+                }
+
+                s_sdkPathCache[sdkName] = sdkPath;
+                return sdkPath;
+            }
+        }
+
+        // Returns the Headers directory path for each framework found inside the SDK's Frameworks directory.
+        // E.g. for "CoreFoundation" returns "<sdk>/System/Library/Frameworks/CoreFoundation.framework/Headers".
+        private static IReadOnlyList<string> GetSystemFrameworkHeaderPaths(string sdkName, IEnumerable<string> frameworkNames)
+        {
+            var result = new List<string>();
+            string sdkPath = GetSdkPath(sdkName);
+            if (string.IsNullOrEmpty(sdkPath))
+                return result.AsReadOnly();
+
+            foreach (string frameworkName in frameworkNames)
+            {
+                string headersPath = System.IO.Path.Combine(sdkPath, "System", "Library", "Frameworks",
+                    frameworkName + ".framework", "Headers");
+                if (System.IO.Directory.Exists(headersPath))
+                    result.Add(headersPath);
+            }
+
+            return result.AsReadOnly();
+        }
+
         // Returns "NAME=VALUE" strings for all non-function-like built-in macros reported by
         //   clang++ -dM -E -x c++ /dev/null -isysroot <sdk-path>
         private static IReadOnlyList<string> GetClangBuiltinDefinesForSdk(string sdkName)
@@ -590,7 +636,7 @@ namespace Sharpmake
                 var result = new List<string>();
                 try
                 {
-                    string sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
+                    string sdkPath = GetSdkPath(sdkName);
                     if (!string.IsNullOrEmpty(sdkPath))
                     {
                         string clangOutput = RunProcessAndGetOutput(
@@ -651,8 +697,8 @@ namespace Sharpmake
                 var result = new List<string>();
                 try
                 {
-                    // Get the SDK path via xcrun
-                    string sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
+                    // Get the SDK path
+                    string sdkPath = GetSdkPath(sdkName);
                     if (!string.IsNullOrEmpty(sdkPath))
                     {
                         // Run clang to get the system include paths
@@ -762,8 +808,13 @@ namespace Sharpmake
         }
         public IEnumerable<string> GetPlatformIncludePaths(IGenerationContext context)
         {
+            var conf = context.Configuration;
+            var systemFrameworks = new OrderableStrings(conf.XcodeSystemFrameworks);
+            systemFrameworks.AddRange(conf.XcodeDependenciesSystemFrameworks);
+
             return GetPlatformIncludePathsWithPrefixImpl(context).Select(x => x.Path)
-                .Concat(GetClangSystemIncludePathsForSdk(XcrunSdkName));
+                .Concat(GetClangSystemIncludePathsForSdk(XcrunSdkName))
+                .Concat(GetSystemFrameworkHeaderPaths(XcrunSdkName, systemFrameworks));
         }
         public IEnumerable<IncludeWithPrefix> GetPlatformIncludePathsWithPrefix(IGenerationContext context)
         {
