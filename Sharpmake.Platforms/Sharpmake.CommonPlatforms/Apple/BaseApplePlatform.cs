@@ -575,6 +575,72 @@ namespace Sharpmake
         private static readonly Dictionary<string, IReadOnlyList<string>> s_clangSystemIncludeCache = new Dictionary<string, IReadOnlyList<string>>();
         private static readonly object s_clangSystemIncludeCacheLock = new object();
 
+        private static readonly Dictionary<string, IReadOnlyList<string>> s_clangBuiltinDefinesCache = new Dictionary<string, IReadOnlyList<string>>();
+        private static readonly object s_clangBuiltinDefinesCacheLock = new object();
+
+        // Returns "NAME=VALUE" strings for all non-function-like built-in macros reported by
+        //   clang++ -dM -E -x c++ /dev/null -isysroot <sdk-path>
+        private static IReadOnlyList<string> GetClangBuiltinDefinesForSdk(string sdkName)
+        {
+            lock (s_clangBuiltinDefinesCacheLock)
+            {
+                if (s_clangBuiltinDefinesCache.TryGetValue(sdkName, out var cached))
+                    return cached;
+
+                var result = new List<string>();
+                try
+                {
+                    string sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
+                    if (!string.IsNullOrEmpty(sdkPath))
+                    {
+                        string clangOutput = RunProcessAndGetOutput(
+                            "clang++",
+                            $"-dM -E -x c++ /dev/null -isysroot \"{sdkPath}\""
+                        );
+
+                        foreach (string line in clangOutput.Split('\n'))
+                        {
+                            string trimmed = line.Trim();
+                            if (!trimmed.StartsWith("#define ", StringComparison.Ordinal))
+                                continue;
+
+                            string rest = trimmed.Substring(8).Trim();
+                            int space = rest.IndexOf(' ');
+                            string name, value;
+                            if (space < 0)
+                            {
+                                name = rest;
+                                value = "1";
+                            }
+                            else
+                            {
+                                name = rest.Substring(0, space);
+                                value = rest.Substring(space + 1).Trim();
+                                if (value.Length == 0)
+                                    value = "1";
+                            }
+
+                            // Skip function-like macros: NAME(
+                            if (name.IndexOf('(') >= 0)
+                                continue;
+
+                            // Normalize whitespace in value
+                            value = System.Text.RegularExpressions.Regex.Replace(value, @"\s+", " ");
+                            result.Add($"{name}={value}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceWarning($"[Sharpmake] Could not discover built-in defines for SDK '{sdkName}': {ex.Message}");
+                }
+
+                IReadOnlyList<string> readOnly = result.AsReadOnly();
+                s_clangBuiltinDefinesCache[sdkName] = readOnly;
+                return readOnly;
+            }
+        }
+
         private static IReadOnlyList<string> GetClangSystemIncludePathsForSdk(string sdkName)
         {
             lock (s_clangSystemIncludeCacheLock)
@@ -1575,6 +1641,9 @@ namespace Sharpmake
                 if (compilerOption.StartsWith("-D", StringComparison.Ordinal))
                     defines.Add(compilerOption.Substring(2));
             }
+
+            // Add built-in compiler defines (clang++ -dM -E -x c++ /dev/null) for IntelliSense
+            defines.AddRange(GetClangBuiltinDefinesForSdk(XcrunSdkName));
 
             context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";");
         }
