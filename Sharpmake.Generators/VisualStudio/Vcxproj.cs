@@ -796,7 +796,7 @@ namespace Sharpmake.Generators.VisualStudio
             // The system include paths are kept absolute as they refer to SDK locations on disk.
             IEnumerable<string> vcxprojSystemIncludePaths = Enumerable.Empty<string>();
             if (!platformVcxproj.IsMSVC)
-                vcxprojSystemIncludePaths = platformVcxproj.GetVcxprojSystemIncludePaths(context);
+                vcxprojSystemIncludePaths = platformVcxproj.GetSystemIncludePaths(context);
 
             {
                 var projectPaths = Util.PathGetRelative(context.ProjectDirectory, nmakeIncludeSearchPath);

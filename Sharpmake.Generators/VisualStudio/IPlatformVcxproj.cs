@@ -47,7 +47,7 @@ namespace Sharpmake.Generators.VisualStudio
 
         // Returns additional system include paths to add to NMakeIncludeSearchPath in vcxproj
         // (used when IsMSVC is false, e.g. Apple platforms)
-        IEnumerable<string> GetVcxprojSystemIncludePaths(IGenerationContext context);
+        IEnumerable<string> GetSystemIncludePaths(IGenerationContext context);
 
         IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context);
 
