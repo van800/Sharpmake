@@ -138,9 +138,15 @@ namespace Sharpmake
         public virtual bool ExcludesPrecompiledHeadersFromBuild => false;
         public virtual bool HasUserAccountControlSupport => false;
         public virtual bool HasEditAndContinueDebuggingSupport => false;
+        public virtual bool HasVcxprojBuildSupport => true;
 
         public virtual void SetupDeleteExtensionsOnCleanOptions(IGenerationContext context)
         {
+        }
+
+        public virtual IEnumerable<string> GetVcxprojSystemIncludePaths(IGenerationContext context)
+        {
+            yield break;
         }
 
         public virtual IEnumerable<string> GetImplicitlyDefinedSymbols(IGenerationContext context)

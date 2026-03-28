@@ -26,6 +26,8 @@ namespace Sharpmake
             public override string SimplePlatformString => "MacCatalyst"; // "Mac Catalyst" is the actual name
             #endregion
 
+            protected override string XcrunSdkName => "iphoneos";
+
             #region IPlatformBff implementation
             public override string BffPlatformDefine => "_MACCATALYST";
 
