@@ -442,31 +442,16 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="obj\win64\qt\debug\moc_floatanglespinbox.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="obj\win64\qt\debug\qrc_exec.cpp">
+    <ClCompile Include="obj\win64\qt\debug\moc_floatanglespinbox.cpp" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <ClCompile Include="obj\win64\qt\debug\qrc_exec.cpp" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="obj\win64\qt\release\moc_floatanglespinbox.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="obj\win64\qt\release\qrc_exec.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    <ClCompile Include="obj\win64\qt\release\moc_floatanglespinbox.cpp" Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <ClCompile Include="obj\win64\qt\release\qrc_exec.cpp" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="obj\win64\qt\retail\moc_floatanglespinbox.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="obj\win64\qt\retail\qrc_exec.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    <ClCompile Include="obj\win64\qt\retail\moc_floatanglespinbox.cpp" Condition="'$(Configuration)|$(Platform)'=='Retail|x64'" />
+    <ClCompile Include="obj\win64\qt\retail\qrc_exec.cpp" Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Retail|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>

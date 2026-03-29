@@ -281,6 +281,9 @@ namespace Sharpmake.Generators.VisualStudio
                 public static string ProjectFilesSourceBegin =
                 @"    <ClCompile Include=""[file.FilePath]""";
 
+                public static string ProjectFilesSourceCondition =
+                @" Condition=""[sourceCondition]""";
+
                 public static string ProjectFilesResourceBegin =
                 @"    <ResourceCompile Include=""[file.FilePath]""";
 

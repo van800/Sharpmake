@@ -1653,6 +1653,42 @@ namespace Sharpmake.Generators.VisualStudio
                         else
                             fileGenerator.Write(Template.Project.ProjectFilesSourceBegin);
 
+                        // For non-resource ClCompile items: when a file is excluded from some (but not all)
+                        // configurations, use a combined Condition attribute on the <ClCompile> element
+                        // instead of per-configuration <ExcludedFromBuild> child elements.
+                        string sourceCondition = null;
+                        if (!isResource)
+                        {
+                            var includedConfigs = new List<string>();
+                            int excludedCount = 0;
+                            foreach (var c in context.ProjectConfigurations)
+                            {
+                                var pv = context.PresentPlatforms[c.Platform];
+                                bool excl = c.ResolvedSourceFilesBuildExclude.Contains(file.FileName);
+                                if (!excl)
+                                {
+                                    bool isPrecompSrc = !string.IsNullOrEmpty(c.PrecompSource) && file.FileName.EndsWith(c.PrecompSource, StringComparison.OrdinalIgnoreCase);
+                                    if (isPrecompSrc && pv.ExcludesPrecompiledHeadersFromBuild)
+                                        excl = true;
+                                }
+                                if (excl)
+                                {
+                                    ++excludedCount;
+                                }
+                                else
+                                {
+                                    string pName = Util.GetToolchainPlatformString(c.Platform, c.Project, c.Target);
+                                    includedConfigs.Add($"'$(Configuration)|$(Platform)'=='{c.Name}|{pName}'");
+                                }
+                            }
+                            if (excludedCount > 0 && includedConfigs.Count > 0)
+                            {
+                                sourceCondition = string.Join(" Or ", includedConfigs);
+                                using (fileGenerator.Declare("sourceCondition", sourceCondition))
+                                    fileGenerator.Write(Template.Project.ProjectFilesSourceCondition);
+                            }
+                        }
+
                         bool haveFileOptions = false;
                         bool closeFileSource = true;
 
@@ -1689,6 +1725,12 @@ namespace Sharpmake.Generators.VisualStudio
                             if (!isExcludeFromBuild && !isResource)
                                 compiledFiles.Add(file);
 
+                            // When using a combined Condition on the <ClCompile> element, skip all
+                            // per-config content for excluded configurations — MSBuild will not evaluate
+                            // the item for those configurations anyway.
+                            if (sourceCondition != null && isExcludeFromBuild)
+                                continue;
+
                             if (isCompileAsCLRFile || consumeWinRTExtensions || excludeWinRTExtensions)
                                 isDontUsePrecomp = true;
                             if (string.Compare(file.FileExtension, ".c", StringComparison.OrdinalIgnoreCase) == 0)
@@ -1711,7 +1753,7 @@ namespace Sharpmake.Generators.VisualStudio
                             bool hasExceptionSetting = !string.IsNullOrEmpty(exceptionSetting);
 
                             haveFileOptions = haveFileOptions ||
-                                              isExcludeFromBuild ||
+                                              (sourceCondition == null && isExcludeFromBuild) ||
                                               isPrecompSource ||
                                               (isDontUsePrecomp && hasPrecomp) ||
                                               hasForcedIncludes ||
