@@ -579,12 +579,13 @@ namespace Sharpmake
         private static readonly object s_clangBuiltinDefinesCacheLock = new object();
 
         // Returns "NAME=VALUE" strings for all non-function-like built-in macros reported by
-        //   clang++ -dM -E -x c++ /dev/null -isysroot <sdk-path>
-        private static IReadOnlyList<string> GetClangBuiltinDefinesForSdk(string sdkName)
+        //   clang++ -dM -E -x c++ /dev/null [-std=<stdFlag>] -isysroot <sdk-path>
+        private static IReadOnlyList<string> GetClangBuiltinDefinesForSdk(string sdkName, string stdFlag = null)
         {
+            string cacheKey = string.IsNullOrEmpty(stdFlag) ? sdkName : $"{sdkName}|{stdFlag}";
             lock (s_clangBuiltinDefinesCacheLock)
             {
-                if (s_clangBuiltinDefinesCache.TryGetValue(sdkName, out var cached))
+                if (s_clangBuiltinDefinesCache.TryGetValue(cacheKey, out var cached))
                     return cached;
 
                 var result = new List<string>();
@@ -593,9 +594,10 @@ namespace Sharpmake
                     string sdkPath = RunProcessAndGetOutput("xcrun", $"--sdk {sdkName} --show-sdk-path").Trim();
                     if (!string.IsNullOrEmpty(sdkPath))
                     {
+                        string stdArg = string.IsNullOrEmpty(stdFlag) ? string.Empty : $"{stdFlag} ";
                         string clangOutput = RunProcessAndGetOutput(
                             "clang++",
-                            $"-dM -E -x c++ /dev/null -isysroot \"{sdkPath}\""
+                            $"-dM -E -x c++ /dev/null {stdArg}-isysroot \"{sdkPath}\""
                         );
 
                         foreach (string line in clangOutput.Split('\n'))
@@ -636,7 +638,7 @@ namespace Sharpmake
                 }
 
                 IReadOnlyList<string> readOnly = result.AsReadOnly();
-                s_clangBuiltinDefinesCache[sdkName] = readOnly;
+                s_clangBuiltinDefinesCache[cacheKey] = readOnly;
                 return readOnly;
             }
         }
@@ -1642,8 +1644,14 @@ namespace Sharpmake
                     defines.Add(compilerOption.Substring(2));
             }
 
-            // Add built-in compiler defines (clang++ -dM -E -x c++ /dev/null) for IntelliSense
-            defines.AddRange(GetClangBuiltinDefinesForSdk(XcrunSdkName));
+            // Determine the C++ language standard flag (e.g. "-std=c++17") to pass to clang++
+            // so that built-in defines like __cplusplus reflect the correct value.
+            context.CommandLineOptions.TryGetValue("CppLanguageStd", out string cppStdFlag);
+            if (string.IsNullOrEmpty(cppStdFlag) || cppStdFlag == FileGeneratorUtilities.RemoveLineTag)
+                cppStdFlag = null;
+
+            // Add built-in compiler defines (clang++ -dM -E [-std=<cppStd>] -x c++ /dev/null) for IntelliSense
+            defines.AddRange(GetClangBuiltinDefinesForSdk(XcrunSdkName, cppStdFlag));
 
             context.Options["PreprocessorDefinitions"] = defines.JoinStrings(";");
         }
