@@ -78,7 +78,7 @@ namespace HelloXCode
                 // for this project when opened via the generated vcxproj.
                 // The xcodeproj is generated in the same directory as the vcxproj, so we use
                 // $(MSBuildProjectDirectory) to resolve the correct path at build time.
-                string xcodeProjectName = $"{Name}_{target.Platform}";
+                string xcodeProjectName = $"{Name}_{Util.GetSimplePlatformString(target.Platform)}";
                 string xcodeProjectPath = $"$(MSBuildProjectDirectory)/{xcodeProjectName}.xcodeproj";
                 string xcodeConfiguration = target.Optimization.ToString(); // "Debug" or "Release"
                 conf.CustomBuildSettings = new Configuration.NMakeBuildSettings
