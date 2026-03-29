@@ -80,12 +80,16 @@ namespace HelloXCode
                 // $(MSBuildProjectDirectory) to resolve the correct path at build time.
                 string xcodeProjectName = $"{Name}_{Util.GetSimplePlatformString(target.Platform)}";
                 string xcodeProjectPath = $"$(MSBuildProjectDirectory)/{xcodeProjectName}.xcodeproj";
-                string xcodeConfiguration = target.Optimization.ToString(); // "Debug" or "Release"
+                // XCode configurations are named after target.Name which uses ToLowerInvariant()
+                // (e.g. "debug", "release"), so we must match that casing here.
+                // ONLY_ACTIVE_ARCH=NO ensures all architectures are built so that
+                // dependent projects (e.g. pre-linked libs) are consistent across archs.
+                string xcodeConfiguration = target.Optimization.ToString().ToLowerInvariant();
                 conf.CustomBuildSettings = new Configuration.NMakeBuildSettings
                 {
-                    BuildCommand   = $"xcodebuild build   -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration}",
-                    RebuildCommand = $"xcodebuild clean build -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration}",
-                    CleanCommand   = $"xcodebuild clean   -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration}",
+                    BuildCommand   = $"xcodebuild build   -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration} ONLY_ACTIVE_ARCH=NO",
+                    RebuildCommand = $"xcodebuild clean build -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration} ONLY_ACTIVE_ARCH=NO",
+                    CleanCommand   = $"xcodebuild clean   -project \"{xcodeProjectPath}\" -configuration {xcodeConfiguration} ONLY_ACTIVE_ARCH=NO",
                 };
             }
         }
